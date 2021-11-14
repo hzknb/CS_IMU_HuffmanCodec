@@ -19,16 +19,16 @@ struct ASCII_Code{
 };
 int nxx = 0;
 double WPL =0;
-bool search(ASCII_Code* head, int code){
+ASCII_Code* search(ASCII_Code* head, int code){
     ASCII_Code *p;
     p=head->next;
     while(p != nullptr){
         if(p->cde==code){
-            return true;
+            return p;
         }
         else p=p->next;
     }
-    return false;
+    return nullptr;
 }
 HuffmanTree* sort(ASCII_Code * head){
     ASCII_Code * p;
@@ -39,7 +39,7 @@ HuffmanTree* sort(ASCII_Code * head){
     int temp_3;
     p=head;
     while(p->next){
-        q=p->next;
+        q=head->next;
         while(q->next){
             if(q->next->frequency>q->frequency){
                 temp_1=q->cde;q->cde=q->next->cde;q->next->cde=temp_1;
@@ -122,6 +122,7 @@ void load(ASCII_Code *head){
     string filename;
     int temp_code;
     ASCII_Code *p;
+    ASCII_Code *q;
     head->frequency=0;
     p=head;
     cout<<"Input Filename:";
@@ -131,7 +132,8 @@ void load(ASCII_Code *head){
     {
         while(!file.eof()){
             file>>temp_code;
-            if(!search(head,temp_code)){
+            q= search(head,temp_code);
+            if(!q){
                 p->next=new ASCII_Code;
                 p=p->next;
                 p->frequency=1;
@@ -139,7 +141,7 @@ void load(ASCII_Code *head){
                 p->chr=char(temp_code);
                 nxx++;
             }else{
-                p->frequency++;
+                q->frequency++;
                 nxx++;
             }
         }
