@@ -1,9 +1,10 @@
 #include <iostream>
 #include<fstream>
 #include<string>
+#include<stack>
 using namespace std;
 struct HuffmanTree{
-    int weight = 0;
+    double weight = 0;
     HuffmanTree* LChild = nullptr;
     HuffmanTree* RChild = nullptr;
     HuffmanTree* Parent = nullptr;
@@ -14,29 +15,123 @@ struct ASCII_Code{
     char chr = ' ';
     int frequency = 0;
     ASCII_Code *next = nullptr;
-    HuffmanTree * tree = new HuffmanTree;
+    HuffmanTree *tree = new HuffmanTree;
 };
-int num = 0;
+int nxx = 0;
 double WPL =0;
-void load(ASCII_Code * head);
-bool search(ASCII_Code * head, int code);
-HuffmanTree* sort(ASCII_Code * head);
-void create(HuffmanTree* h);
-string codec(ASCII_Code &byte);
-int main() {
-    ASCII_Code *head;
+bool search(ASCII_Code* head, int code){
+    ASCII_Code *p;
+    p=head->next;
+    while(p != nullptr){
+        if(p->cde==code){
+            return true;
+        }
+        else p=p->next;
+    }
+    return false;
+}
+HuffmanTree* sort(ASCII_Code * head){
+    ASCII_Code * p;
+    ASCII_Code * q;
     HuffmanTree* h;
-    head=new ASCII_Code;
-    load(head);
-    h=sort(head);
-    create(h);
-    cout<<"ASCII\tChar\tWeight\tHuffmanCode"<<endl;head=head->next;
+    int temp_1;
+    char temp_2;
+    int temp_3;
+    p=head;
+    while(p->next){
+        q=p->next;
+        while(q->next){
+            if(q->next->frequency<q->frequency){
+                temp_1=q->cde;q->cde=q->next->cde;q->next->cde=temp_1;
+                temp_2=q->chr;q->chr=q->next->chr;q->next->chr=temp_2;
+                temp_3=q->frequency;q->frequency=q->next->frequency;q->next->frequency=temp_3;
+            }
+            q=q->next;
+        }
+        p=p->next;
+    }
+    p=head;
+    h=p->next->tree;
+    while(p!= nullptr){
+        if(p->next!=nullptr)p->tree->next=p->next->tree;
+        p->tree->weight=double(p->frequency)/double(nxx);
+        p=p->next;
+    }return h;
+}
+void create(HuffmanTree* h){
+    HuffmanTree *p;
+    HuffmanTree *q;
+    HuffmanTree *x;
+    q=h;
+    while(q->next!=nullptr){
+        p=q;
+        x=new HuffmanTree;
+        while (p != nullptr) {
+            p->Parent= new HuffmanTree;
+            x->next=p->Parent;
+            p->Parent->LChild = p;
+            if (p->next != nullptr) {
+                p->next->Parent = p->Parent;
+                p->Parent->weight = p->weight + p->next->weight;
+                p->Parent->RChild = p->next;
+                p = p->next->next;
+            } else{
+                p->Parent->weight = p->weight;
+                p=p->next;
+            }
+            x=x->next;
+        }
+        q=q->Parent;
+    }
+}
+string codec(ASCII_Code &byte){
+    stack<char> find;
+    string code;
+    HuffmanTree *p;
+    code="";
+    p=byte.tree;
+    while(p->Parent){
+        if(p->Parent->RChild==nullptr){
+            p=p->Parent;
+            continue;
+        }else if(p->Parent->LChild==p){
+            find.push('0');
+        }else if(p->Parent->RChild==p){
+            find.push('1');
+        }
+        p=p->Parent;
+    }
+    WPL=WPL+(byte.tree->weight*double(find.size()));
+    while(!find.empty()){
+        code+=find.top();
+        find.pop();
+    }
+    return code;
+}
+void show(ASCII_Code *head,HuffmanTree *h){
+    HuffmanTree *yy;
+    bool tag;
+    cout<<"Print Tree:";
+    cin>>tag;
+    if(tag){
+        int i = 1;
+        while (h != nullptr) {
+            yy = h;
+            cout << "Floor" << i++ << ":";
+            while (yy != nullptr) {
+                cout << yy->weight << " ";
+                yy = yy->next;
+            }
+            cout << endl;
+            h = h->Parent;
+        }
+    }
+    cout<<"ASCII\tChar\tWeight\t\tHuffmanCode"<<endl;head=head->next;
     while(head!=nullptr){
-        cout<<head->cde<<"\t\t"<<head->chr<<"\t\t"<<head->tree->weight<<"\t\t"<<codec(*head)<<endl;
+        cout<<head->cde<<"\t "<<head->chr<<"\t "<<head->tree->weight<<"\t\t"<<codec(*head)<<endl;
         head=head->next;
     }
     cout<<"WPL:"<<WPL;
-    return 0x1BF52;
 }
 void load(ASCII_Code *head){
     fstream file;
@@ -58,86 +153,21 @@ void load(ASCII_Code *head){
                 p->frequency=1;
                 p->cde=temp_code;
                 p->chr=char(temp_code);
-                num++;
+                nxx++;
+            }else{
+                p->frequency++;
+                nxx++;
             }
         }
     }
 }
-bool search(ASCII_Code* head, int code){
-    ASCII_Code *p;
-    p=head->next;
-    while(p != nullptr){
-        if(p->cde==code){
-            p->frequency++;
-            return true;
-        }
-        else p=p->next;
-    }
-    return false;
-}
-HuffmanTree* sort(ASCII_Code * head){
-    ASCII_Code * p;
-    ASCII_Code * q;
+int main() {
+    ASCII_Code *head;
     HuffmanTree* h;
-    HuffmanTree* r;
-    int temp_1;
-    char temp_2;
-    int temp_3;
-    p=head;
-    while(p->next){
-        q=p->next;
-        while(q->next){
-            if(q->next->frequency<q->frequency){
-                temp_1=q->cde;q->cde=q->next->cde;q->next->cde=temp_1;
-                temp_2=q->chr;q->chr=q->next->chr;q->next->chr=temp_2;
-                temp_3=q->frequency;q->frequency=q->next->frequency;q->next->frequency=temp_3;
-            }
-            q=q->next;
-        }
-        p=p->next;
-    }p=head;h=new HuffmanTree;r=h;p=p->next;
-    while(p!= nullptr){
-        r->next=new HuffmanTree;
-        r=r->next;
-        r->weight=p->frequency/num;
-        p->tree=r;p=p->next;
-    }
-    return h;
-}
-void create(HuffmanTree* h){
-    HuffmanTree *p;
-    HuffmanTree *q;
-    q=h->next;
-    while(q->Parent!=nullptr) {
-        p=q;
-        while (p != nullptr) {
-            p->Parent = new HuffmanTree;
-            p->Parent->LChild = p;
-            if (p->next != nullptr) {
-                p->next->Parent = p->Parent;
-                p->Parent->weight = p->weight + p->next->weight;
-                p->Parent->RChild = p->next;
-            } else p->Parent->weight = p->weight;
-            p = p->next->next;
-        }
-        q=q->Parent;
-    }
-}
-string codec(ASCII_Code &byte){
-    string code;
-    HuffmanTree *p;
-    int i=0;
-    code="";
-    p=byte.tree;
-    while(p->Parent){
-        if(p->Parent->RChild==nullptr){
-            continue;
-        }else if(p->Parent->LChild==p){
-            code+='0';i++;
-        }else if(p->Parent->RChild==p){
-            code+='1';i++;
-        }
-    }
-    WPL+=(i*byte.tree->weight);
-    return code;
+    head=new ASCII_Code;
+    load(head);
+    h=sort(head);
+    create(h);
+    show(head,h);
+    return 0x1BF52;
 }
