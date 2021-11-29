@@ -13,4 +13,4 @@
 （3）要求打印出原始数据、每个字符对应的Huffman编码和总编码长度。
 # 核心问题：
   如何统计文档中字符出现的频度；如何构造哈夫曼树；如何对每个字符进行Huffman编码；如何计算每个字符对应的Huffman编码和总编码长度等信息。
-# Copyright@Ceonlam Lau
+# CS_IMU@Ceonlam Lau
